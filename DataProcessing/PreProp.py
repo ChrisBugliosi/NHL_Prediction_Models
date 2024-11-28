@@ -5,11 +5,14 @@ from os import path
 
 # Load in CSV
 DATA_DIR = '/Users/chrisbugs/Downloads'
-df = pd.read_csv(path.join(DATA_DIR, 'all_teams (1).csv'))
+df = pd.read_csv(path.join(DATA_DIR, 'all_teams.csv'))
 print(df.shape)
 
 # Remove playoff games
 df = df[df['playoffGame'] != 1]
+
+# Drop 2024 season (it is incomplete)
+df = df[df['season'] != 2024 ]
 
 # Remove unnecessary columns (don't need xxxxAgainst stats since we're merging home and away df's later)
 df = df[['team', 'season', 'gameId', 'home_or_away', 'gameDate', 'situation', 'xGoalsPercentage', 'corsiPercentage',
@@ -61,12 +64,7 @@ print(df.isnull().sum().max())
 # Save result to SQL database and CSV
 save = False
 if save:
-    db_path = '/Users/chrisbugs/Downloads/HockeyData.db'
-    conn = sqlite3.connect(db_path)
-    df.to_sql('wrangled_hockey_data', conn, if_exists='replace', index=False)
-    conn.close()
-    print("DataFrame successfully saved to SQLite database.")
-    df.to_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
+    df.to_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV10.csv')
     print("DataFrame successfully saved to CSV database.")
 
 

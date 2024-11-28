@@ -12,8 +12,8 @@ import seaborn as sns
 
 
 # Load Data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV1.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 # Preprocess Data
 features_df.drop(columns=['Unnamed: 0'], inplace=True)

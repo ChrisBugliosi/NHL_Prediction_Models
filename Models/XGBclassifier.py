@@ -14,8 +14,8 @@ from sklearn.model_selection import train_test_split
 XGB Classifier w/ default data
 """
 # Load datasets
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV2.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 # Prepare features and labels
 features_df.drop(columns=['Unnamed: 0'], inplace=True)
@@ -106,8 +106,8 @@ plt.show()
 XGB Classifier w/ PCA data
 """
 # Load datasets
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/PCAFeaturesHockeyDataV1.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/PCAFeaturesHockeyDataV2.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 # Prepare features and labels
 x_features = features_df  # Features

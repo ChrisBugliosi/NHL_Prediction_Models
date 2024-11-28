@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 Logistic Regression
 """
 # Load in data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV2.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 
 features_df.drop(columns=['Unnamed: 0'], inplace=True)

@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 # Load the data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV2.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
 features_df.drop(columns='Unnamed: 0', inplace=True)
 
 # Filter out columns that do not start with "away_" (using away columns is redundant)
@@ -40,7 +40,7 @@ plt.title('Features Correlation Matrix', fontsize=20, pad=20)
 plt.show()
 
 # Load in data
-wrangled_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+wrangled_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 # Distribution of goalsFor
 plt.figure(figsize=(12, 6))

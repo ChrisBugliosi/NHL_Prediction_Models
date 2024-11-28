@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 Logistic Regression w/ L1 & standardized data
 """
 # Load standardized data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV1.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 features_df.drop(columns=['Unnamed: 0'], inplace=True)
 x_features = features_df
@@ -104,8 +104,8 @@ plt.show()
 Logistic Regression w/ L2 & standardized data
 """
 # Load standardized data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV1.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 features_df.drop(columns=['Unnamed: 0'], inplace=True)
 x_features = features_df

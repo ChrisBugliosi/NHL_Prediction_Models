@@ -11,8 +11,7 @@ from os import path
 
 
 # Load in CSV
-DATA_DIR = '/Users/chrisbugs/Downloads'
-df = pd.read_csv(path.join(DATA_DIR, 'WrangledHockeyDataV6.csv'))
+df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 df.drop(columns='Unnamed: 0', inplace=True)
 
@@ -51,14 +50,7 @@ print(df.isnull().sum().max())
 # Save result to SQL database and CSV
 save = False
 if save:
-    db_path = '/Users/chrisbugs/Downloads/HockeyData.db'
-    conn = sqlite3.connect(db_path)
-    feautres_df.to_sql('feautres_hockey_data', conn, if_exists='replace', index=False)
-    df.to_sql('team_data_w_features', conn, if_exists='replace', index=False)
-    conn.close()
-    print("DataFrame successfully saved to SQLite database.")
-    feautres_df.to_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
-    df.to_csv('/Users/chrisbugs/Downloads/HockeyDataWFeaturesV2.csv')
+    feautres_df.to_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV4.csv')
     print("DataFrame successfully saved to CSV database.")
 
 
@@ -66,7 +58,7 @@ if save:
 standardize = False
 if standardize:
     # Re-load in CSV to avoid re-doing calculations
-    features_df = pd.read_csv(path.join(DATA_DIR, 'FeaturesHockeyDataV2.csv'))
+    features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
 
     # Standardized features
     scaler = StandardScaler()
@@ -76,19 +68,14 @@ if standardize:
 
 save = False
 if save:
-    db_path = '/Users/chrisbugs/Downloads/HockeyData.db'
-    conn = sqlite3.connect(db_path)
-    standardized_features_df.to_sql('standardized_hockey_features', conn, if_exists='replace', index=False)
-    conn.close()
-    print("DataFrame successfully saved to SQLite database.")
-    standardized_features_df.to_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
+    standardized_features_df.to_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV3.csv')
     print("DataFrame successfully saved to CSV database.")
 
 # Normalizing the data (for models that prefer normalized data)
 normalize = False
 if normalize:
     # Re-load in CSV to avoid re-doing calculations
-    features_df = pd.read_csv(path.join(DATA_DIR, 'FeaturesHockeyDataV2.csv'))
+    features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
 
     # Normalize features
     scaler = MinMaxScaler()
@@ -98,19 +85,14 @@ if normalize:
 
 save = False
 if save:
-    db_path = '/Users/chrisbugs/Downloads/HockeyData.db'
-    conn = sqlite3.connect(db_path)
-    normalized_features_df.to_sql('normalized_hockey_features', conn, if_exists='replace', index=False)
-    conn.close()
-    print("DataFrame successfully saved to SQLite database.")
-    normalized_features_df.to_csv('/Users/chrisbugs/Downloads/NormalizedHockeyFeaturesV2.csv')
+    normalized_features_df.to_csv('/Users/chrisbugs/Downloads/NormalizedHockeyFeaturesV3.csv')
     print("DataFrame successfully saved to CSV database.")
 
 # PCA to reduce multicollinearity
 pca_run = False
 if pca_run:
     # Load in standardized CSV
-    standardized_features_df = pd.read_csv(path.join(DATA_DIR, 'StandardizedHockeyFeaturesV1.csv'))
+    standardized_features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
 
     # Apply PCA
     pca = PCA(n_components=10)
@@ -130,11 +112,6 @@ if pca_run:
     # Save PCA result
     save_pca = False
     if save_pca:
-        db_path = '/Users/chrisbugs/Downloads/HockeyData.db'
-        conn = sqlite3.connect(db_path)
-        pca_features_df.to_sql('PCA_features_hockey_data', conn, if_exists='replace', index=False)
-        conn.close()
-        print("DataFrame successfully saved to SQLite database.")
-        pca_features_df.to_csv('/Users/chrisbugs/Downloads/PCAFeaturesHockeyDataV2.csv', index=False)
+        pca_features_df.to_csv('/Users/chrisbugs/Downloads/PCAFeaturesHockeyDataV3.csv', index=False)
         print("PCA DataFrame successfully saved to CSV.")
     

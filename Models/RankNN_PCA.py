@@ -8,12 +8,10 @@ import matplotlib.pyplot as plt
 
 # TODO: OPTIMIZE ALL THE MODELS (bayesian optimization)!!!!!!
 
-# TODO: CHECK ON THE SEASON/GAMEDATE COLUMN AND MAKE SURE IT'S ACTUALLY RIGHT!!!! (AND FIX IT IF ITS NOT!)
-
 
 # Load Data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/PCAFeaturesHockeyDataV1.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/PCAFeaturesHockeyDataV2.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 # Preprocess Data
 recent_season = total_df['season'].max()
@@ -118,7 +116,7 @@ print(team_rankings)
 # Plot Team Rankings
 plt.figure(figsize=(10, 8))
 team_rankings.plot(kind='barh', color='skyblue', edgecolor='black')
-plt.title('2024 Team Rankings Based on Neural Network Predictions (With PCA)', fontsize=16)
+plt.title('2023-24 Team Rankings Based on Neural Network Predictions (With PCA)', fontsize=16)
 plt.xlabel('Predicted Score', fontsize=14)
 plt.ylabel('Team', fontsize=14)
 plt.gca().invert_yaxis()

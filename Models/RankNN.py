@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 
 # Load Data
-features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV1.csv')
-total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV8.csv')
+features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
+total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 
 # Preprocess Data
 features_df.drop(columns=['Unnamed: 0'], inplace=True)
@@ -113,7 +113,7 @@ print(team_rankings)
 # Plot Team Rankings
 plt.figure(figsize=(10, 8))
 team_rankings.plot(kind='barh', color='skyblue', edgecolor='black')
-plt.title('2024 Team Rankings Based on Neural Network Predictions', fontsize=16)
+plt.title('2023-24 Team Rankings Based on Neural Network Predictions', fontsize=16)
 plt.xlabel('Predicted Score', fontsize=14)
 plt.ylabel('Team', fontsize=14)
 plt.gca().invert_yaxis()
