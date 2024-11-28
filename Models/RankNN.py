@@ -105,6 +105,10 @@ team_rankings = (
     .sort_values(ascending=False)  # Sort by score, not alphabetically
 )
 
+# Standardize Scores from 0 to 100
+min_score = team_rankings.min()
+max_score = team_rankings.max()
+team_rankings = (team_rankings - min_score) / (max_score - min_score) * 100  # Scale to [0, 100]
 
 # Display Rankings
 print("Team Rankings (Most Recent Season):")
