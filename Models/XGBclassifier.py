@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score, roc
 from sklearn.model_selection import train_test_split
 
 
-# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization)!!!!!!
+# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization) AND TEST ACROSS HOLDOUT SEASONS!!!!!!
 
 
 """

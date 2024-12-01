@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization)!!!!!!
+# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization) AND TEST ACROSS HOLDOUT SEASONS!!!!!!
 
 
 # Load Data

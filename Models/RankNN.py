@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization)!!!!!!
+# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization) AND TEST ACROSS HOLDOUT SEASONS!!!!!!
 
 
 # Load Data
@@ -123,13 +123,20 @@ plt.show()
 # Determine the most recent season
 recent_season = total_df['season'].max()
 
+# Filter data for the most recent season
+recent_season_data = total_df[total_df['season'] == recent_season]
+
+# Deduplicate games to ensure each game is counted only once
+# Use 'gameId' to deduplicate and keep only one row per game
+unique_games = recent_season_data.drop_duplicates(subset=['gameId'])
+
 # Calculate wins for each team in the most recent season
 # Home team wins
-home_wins = total_df[(total_df['season'] == recent_season) & (total_df['home_team_win'] == 1)]
+home_wins = unique_games[unique_games['home_team_win'] == 1]
 home_wins_count = home_wins.groupby('team').size()
 
 # Away team wins
-away_wins = total_df[(total_df['season'] == recent_season) & (total_df['home_team_win'] == 0)]
+away_wins = unique_games[unique_games['home_team_win'] == 0]
 away_wins_count = away_wins.groupby('away_team').size()
 
 # Combine home and away wins
