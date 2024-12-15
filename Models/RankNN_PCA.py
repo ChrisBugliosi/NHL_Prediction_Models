@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 
 # TODO: OPTIMIZE ALL THE MODELS (bayesian optimization) AND TEST ACROSS HOLDOUT SEASONS!!!!!!
+# TODO: FIX THE REAL TEAM STANDINGS!!!!!!!
 
 
 # Load Data

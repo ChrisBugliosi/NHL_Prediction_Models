@@ -2,12 +2,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
+from bayes_opt import BayesianOptimization
 import pandas as pd
 import matplotlib.pyplot as plt
-
-
-# TODO: OPTIMIZE ALL THE MODELS (bayesian optimization) AND TEST ACROSS HOLDOUT SEASONS!!!!!!
-
+import seaborn as sns
 
 # Load Data
 features_df = pd.read_csv('/Users/chrisbugs/Downloads/StandardizedHockeyFeaturesV2.csv')
@@ -17,23 +15,21 @@ total_df = pd.read_csv('/Users/chrisbugs/Downloads/WrangledHockeyDataV9.csv')
 features_df.drop(columns=['Unnamed: 0'], inplace=True)
 recent_season = total_df['season'].max()
 
-# Ensure data alignment by keeping team and gameId columns in metadata
 features_df['team'] = total_df['team']
 features_df['gameId'] = total_df['gameId']
 features_df['season'] = total_df['season']
 
 # Split into holdout (most recent season) and training dataset
 holdout_features = features_df[features_df['season'] == recent_season].drop(columns=['season', 'team', 'gameId'])
-holdout_metadata = features_df[features_df['season'] == recent_season][['gameId', 'team']]  # Metadata for alignment
-holdout_targets = total_df[total_df['season'] == recent_season]['home_team_win']  # Holdout targets
+holdout_metadata = features_df[features_df['season'] == recent_season][['gameId', 'team']]
+holdout_targets = total_df[total_df['season'] == recent_season]['home_team_win']
 
 train_features = features_df[features_df['season'] != recent_season].drop(columns=['season', 'team', 'gameId'])
-train_targets = total_df[total_df['season'] != recent_season]['home_team_win']  # Training targets
+train_targets = total_df[total_df['season'] != recent_season]['home_team_win']
 
 # Further split training dataset into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(train_features, train_targets, test_size=0.2, random_state=42)
 
-# Convert to Tensors
 X_train = torch.tensor(X_train.values, dtype=torch.float32)
 X_val = torch.tensor(X_val.values, dtype=torch.float32)
 X_holdout = torch.tensor(holdout_features.values, dtype=torch.float32)
@@ -43,30 +39,69 @@ y_holdout = torch.tensor(holdout_targets.values, dtype=torch.float32)
 
 # Neural Network Definition
 class HockeyNet(nn.Module):
-    def __init__(self, input_size):
+    def __init__(self, input_size, hidden1, hidden2, dropout_rate):
         super(HockeyNet, self).__init__()
-        self.fc1 = nn.Linear(input_size, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, 1)  # Outputs performance score
+        self.fc1 = nn.Linear(input_size, hidden1)
+        self.fc2 = nn.Linear(hidden1, hidden2)
+        self.fc3 = nn.Linear(hidden2, 1)
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         x = self.relu(self.fc1(x))
         x = self.dropout(x)
         x = self.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.sigmoid(self.fc3(x))
         return x
 
-# Initialize Model
-input_size = X_train.shape[1]
-model = HockeyNet(input_size)
-criterion = nn.MSELoss()  # Mean Squared Error for regression
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# Bayesian Optimization Function
+def nn_evaluate(hidden1, hidden2, dropout_rate, lr, epochs):
+    hidden1, hidden2, epochs = int(hidden1), int(hidden2), int(epochs)
+    model = HockeyNet(X_train.shape[1], hidden1, hidden2, dropout_rate)
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(model.parameters(), lr=lr)
 
-# Training Loop
-epochs = 100
-for epoch in range(epochs):
+    for epoch in range(epochs):
+        model.train()
+        optimizer.zero_grad()
+        y_pred = model(X_train).squeeze()
+        loss = criterion(y_pred, y_train)
+        loss.backward()
+        optimizer.step()
+
+    model.eval()
+    with torch.no_grad():
+        y_val_pred = (model(X_val).squeeze() > 0.5).float()
+        accuracy = (y_val_pred == y_val).float().mean().item()
+    return accuracy
+
+# Perform Bayesian Optimization
+optimizer = BayesianOptimization(
+    f=nn_evaluate,
+    pbounds={
+        'hidden1': (32, 128),
+        'hidden2': (16, 64),
+        'dropout_rate': (0.1, 0.5),
+        'lr': (0.0001, 0.01),
+        'epochs': (50, 150)
+    },
+    random_state=42
+)
+
+print("Running Bayesian Optimization...")
+optimizer.maximize(init_points=5, n_iter=15)
+
+# Best Parameters
+best_params = optimizer.max['params']
+best_params['hidden1'], best_params['hidden2'], best_params['epochs'] = int(best_params['hidden1']), int(best_params['hidden2']), int(best_params['epochs'])
+
+# Train Optimized Model
+model = HockeyNet(X_train.shape[1], best_params['hidden1'], best_params['hidden2'], best_params['dropout_rate'])
+criterion = nn.BCELoss()
+optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
+
+for epoch in range(best_params['epochs']):
     model.train()
     optimizer.zero_grad()
     y_pred = model(X_train).squeeze()
@@ -74,123 +109,73 @@ for epoch in range(epochs):
     loss.backward()
     optimizer.step()
 
-    # Validation loss
-    model.eval()
-    with torch.no_grad():
-        y_val_pred = model(X_val).squeeze()
-        val_loss = criterion(y_val_pred, y_val)
-
-    if (epoch + 1) % 10 == 0:
-        print(f"Epoch [{epoch + 1}/{epochs}], Training Loss: {loss.item():.4f}, Validation Loss: {val_loss.item():.4f}")
-
 # Evaluate on Holdout Set
 model.eval()
 with torch.no_grad():
-    y_holdout_pred = model(X_holdout).squeeze()
-    holdout_loss = criterion(y_holdout_pred, y_holdout)
-    print(f"Holdout Loss (Most Recent Season): {holdout_loss.item():.4f}")
+    y_holdout_pred = (model(X_holdout).squeeze() > 0.5).float()
+    holdout_accuracy = (y_holdout_pred == y_holdout).float().mean().item()
+    print(f"Holdout Accuracy: {holdout_accuracy:.4f}")
 
-# Align predictions with metadata using indices
-holdout_metadata = holdout_metadata.reset_index(drop=True)  # Ensure indices are aligned with predictions
+holdout_metadata = holdout_metadata.reset_index(drop=True)
 holdout_metadata['score'] = y_holdout_pred.numpy()
 
-# Debugging: Check alignment
-assert len(holdout_metadata) == len(y_holdout_pred), "Mismatch between metadata and predictions!"
-print(holdout_metadata.head())  # Ensure gameId, team, and score are aligned
-
-# Aggregate predictions by team for rankings
-team_rankings = (
-    holdout_metadata.groupby('team')['score']
-    .mean()
-    .sort_values(ascending=False)  # Sort by score, not alphabetically
-)
-
-
-# Display Rankings
-print("Team Rankings (Most Recent Season):")
-print(team_rankings)
+team_rankings = holdout_metadata.groupby('team')['score'].mean().sort_values(ascending=False)
 
 # Plot Team Rankings
 plt.figure(figsize=(10, 8))
 team_rankings.plot(kind='barh', color='skyblue', edgecolor='black')
-plt.title('2023-24 Team Rankings Based on Neural Network Predictions', fontsize=16)
-plt.xlabel('Predicted Score', fontsize=14)
-plt.ylabel('Team', fontsize=14)
+plt.title('2023-24 Team Rankings Based on Optimized Neural Network Predictions')
+plt.xlabel('Predicted Score')
+plt.ylabel('Team')
 plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.show()
 
-# Determine the most recent season
-recent_season = total_df['season'].max()
-
-# Filter data for the most recent season
+# Calculate Wins for Each Team
 recent_season_data = total_df[total_df['season'] == recent_season]
-
-# Deduplicate games to ensure each game is counted only once
-# Use 'gameId' to deduplicate and keep only one row per game
 unique_games = recent_season_data.drop_duplicates(subset=['gameId'])
-
-# Calculate wins for each team in the most recent season
-# Home team wins
-home_wins = unique_games[unique_games['home_team_win'] == 1]
-home_wins_count = home_wins.groupby('team').size()
-
-# Away team wins
-away_wins = unique_games[unique_games['home_team_win'] == 0]
-away_wins_count = away_wins.groupby('away_team').size()
-
-# Combine home and away wins
+home_wins_count = unique_games[unique_games['home_team_win'] == 1].groupby('team').size()
+away_wins_count = unique_games[unique_games['home_team_win'] == 0].groupby('away_team').size()
 total_wins = home_wins_count.add(away_wins_count, fill_value=0).sort_values(ascending=False)
 
-# Create a final standings DataFrame
+# Final Standings
 final_standings = pd.DataFrame({
     'team': total_wins.index,
     'wins': total_wins.values
 }).sort_values(by='wins', ascending=False)
 
-# Display final standings
-print(final_standings)
-
-# Plot the final standings
 plt.figure(figsize=(10, 8))
 plt.barh(final_standings['team'], final_standings['wins'], color='skyblue', edgecolor='black')
-plt.title('Final Standings Based on Wins (Most Recent Season)', fontsize=16)
-plt.xlabel('Wins', fontsize=14)
-plt.ylabel('Team', fontsize=14)
+plt.title('Final Standings Based on Wins')
+plt.xlabel('Wins')
+plt.ylabel('Team')
 plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.show()
 
-# Create a DataFrame for team rankings from the neural network
+# Comparison Between Actual and Predicted Standings
 nn_standings = pd.DataFrame({
     'team': team_rankings.index,
-    'nn_rank': range(1, len(team_rankings) + 1)  # Rank the neural network's predicted standings
+    'nn_rank': range(1, len(team_rankings) + 1)
 })
 
-# Add ranks for actual standings
 actual_standings = final_standings.reset_index(drop=True)
 actual_standings['actual_rank'] = range(1, len(actual_standings) + 1)
 
-# Merge neural network standings with actual standings
 comparison = pd.merge(actual_standings, nn_standings, on='team')
-
-# Calculate the rank difference for each team
 comparison['rank_difference'] = abs(comparison['actual_rank'] - comparison['nn_rank'])
-
-# Compute the total rank difference
 total_rank_difference = comparison['rank_difference'].sum()
 
-# Print results
 print("Comparison of Actual vs Neural Network Predicted Standings:")
 print(comparison)
 print(f"\nTotal Rank Difference: {total_rank_difference}")
 
-# Plotting Comparison
+# Plot Rank Differences
 plt.figure(figsize=(10, 8))
 plt.barh(comparison['team'], comparison['rank_difference'], color='coral', edgecolor='black')
-plt.title('Rank Differences Between Neural Network Predictions and Actual Standings', fontsize=16)
-plt.xlabel('Rank Difference', fontsize=14)
-plt.ylabel('Team', fontsize=14)
+plt.title('Rank Differences Between Neural Network Predictions and Actual Standings')
+plt.xlabel('Rank Difference')
+plt.ylabel('Team')
 plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.show()

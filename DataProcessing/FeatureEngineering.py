@@ -106,7 +106,7 @@ if pca_run:
     pca = PCA().fit(standardized_features_df)
     plt.plot(np.cumsum(pca.explained_variance_ratio_))
     plt.xlabel('Number of Components')
-    plt.ylabel('Cumulative Explained Variance')#
+    plt.ylabel('Cumulative Explained Variance')
     plt.show()
 
     # Save PCA result
