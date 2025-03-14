@@ -63,14 +63,14 @@ def evaluate_logistic_regression(penalty, solver, param_grid, model_name):
     print("\nClassification Report (Holdout):")
     print(classification_report(holdout_targets, y_holdout_pred, target_names=['Loss', 'Win']))
 
-# Logistic Regression with L1 Regularization
+"""# Logistic Regression with L1 Regularization
 param_grid_l1 = {'C': [0.01, 0.1, 1, 10, 100]}  # Regularization strength grid
 evaluate_logistic_regression(penalty='l1', solver='liblinear', param_grid=param_grid_l1, model_name="Logistic Regression with L1")
 
 # Logistic Regression with L2 Regularization
 param_grid_l2 = {'C': [0.01, 0.1, 1, 10, 100]}
 evaluate_logistic_regression(penalty='l2', solver='lbfgs', param_grid=param_grid_l2, model_name="Logistic Regression with L2")
-
+"""
 # Logistic Regression with ElasticNet Regularization
 param_grid_en = {
     'C': [0.01, 0.1, 1, 10, 100],

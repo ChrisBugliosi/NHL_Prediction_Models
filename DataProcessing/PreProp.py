@@ -23,7 +23,7 @@ df = df[['team', 'season', 'gameId', 'home_or_away', 'gameDate', 'situation', 'x
          'highDangerxGoalsFor', 'lowDangerGoalsFor', 'mediumDangerGoalsFor', 'highDangerGoalsFor',
          'dZoneGiveawaysFor']]
 
-
+print(df.describe())
 # Split DF on home and away (for simplyfying classfying into home team win or loss)
 home_df = df[df['home_or_away'] == 'HOME'].reset_index(drop=True)
 away_df = df[df['home_or_away'] == 'AWAY'].reset_index(drop=True)

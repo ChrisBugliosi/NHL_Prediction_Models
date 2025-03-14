@@ -76,7 +76,7 @@ best_params['max_depth'] = int(best_params['max_depth'])
 print("\nBest Parameters Found:")
 print(best_params)
 
-# Train Final Model with Best Parameters and Early Stopping
+# Train Final Model with Best Parameters
 final_model = xgb.XGBClassifier(
     **best_params,
     use_label_encoder=False,

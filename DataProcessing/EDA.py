@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-# TODO: Need a lot more EDA visuals!!!
-
-
 # Load the data
 features_df = pd.read_csv('/Users/chrisbugs/Downloads/FeaturesHockeyDataV3.csv')
 features_df.drop(columns='Unnamed: 0', inplace=True)
