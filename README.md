@@ -5,6 +5,6 @@ pipeline with individual game data at the team level consisting of NHL games fro
 the NHL API, MoneyPuck, and various other sources.
 
 Predictions were created using various neural networks, XGBoost, logistic regression with ElasticNet regularization, and other 
-methods to create win/loss classifiers and single season final standings prediction models that were tested on the 2023-24 NHL season.
+methods to create win/loss classifiers and single season final standings prediction models that were then optimized and tested on the 2023-24 NHL season.
 
 I hope you enjoy my project!
